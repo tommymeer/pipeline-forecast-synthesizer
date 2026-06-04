@@ -1,0 +1,26 @@
+deal_name,stage,amount,close_date,owner,last_activity_date,created_date,deal_type,segment
+Meridian Health - Enterprise Platform,Negotiation,185000,2026-06-30,Sarah Chen,2026-06-01,2026-02-14,New Business,Enterprise
+Thornfield Capital - Data Suite,Negotiation,142000,2026-06-30,Sarah Chen,2026-05-28,2026-02-28,New Business,Enterprise
+Axon Logistics - Operations Module,Proposal,98000,2026-06-30,Marcus Webb,2026-06-02,2026-03-10,New Business,Mid-Market
+Vantage Partners - Growth Package,Proposal,76000,2026-06-15,Sarah Chen,2026-05-15,2026-03-01,New Business,Mid-Market
+Clearwater Systems - Analytics Add-on,Proposal,54000,2026-06-30,Marcus Webb,2026-06-01,2026-03-22,Expansion,Mid-Market
+Redstone Manufacturing - Core Platform,Proposal,67000,2026-06-30,Jordan Lee,2026-05-30,2026-03-15,New Business,Mid-Market
+Pacific Ventures - Starter Bundle,Discovery,38000,2026-07-15,Jordan Lee,2026-06-02,2026-04-01,New Business,SMB
+Luminary Creative - Team License,Discovery,29000,2026-07-15,Marcus Webb,2026-05-25,2026-04-10,New Business,SMB
+Northgate Retail - Enterprise Suite,Discovery,112000,2026-07-31,Sarah Chen,2026-04-30,2026-03-05,New Business,Enterprise
+Cascade Bio - Research Platform,Discovery,88000,2026-07-31,Jordan Lee,2026-06-01,2026-04-05,New Business,Enterprise
+Summit Advisory - Professional Plan,Qualification,45000,2026-07-31,Marcus Webb,2026-05-20,2026-04-15,New Business,Mid-Market
+Ironwood Construction - Field Module,Qualification,33000,2026-07-31,Jordan Lee,2026-05-28,2026-04-20,New Business,SMB
+Prism Media - Content Suite,Qualification,28000,2026-08-15,Sarah Chen,2026-06-02,2026-04-25,New Business,SMB
+Halcyon Hotels - Operations Platform,Qualification,95000,2026-08-15,Marcus Webb,2026-05-10,2026-03-30,New Business,Enterprise
+Solaris Energy - Analytics Module,Qualification,41000,2026-08-15,Jordan Lee,2026-06-01,2026-05-01,Expansion,Mid-Market
+Titan Freight - Core Platform,Prospecting,62000,2026-08-31,Sarah Chen,2026-05-22,2026-05-10,New Business,Mid-Market
+Ember Studios - Creative Suite,Prospecting,24000,2026-08-31,Marcus Webb,2026-06-02,2026-05-12,New Business,SMB
+Keystone Financial - Compliance Module,Prospecting,78000,2026-08-31,Jordan Lee,2026-05-29,2026-05-08,New Business,Enterprise
+Orbit Technology - Developer Platform,Prospecting,35000,2026-08-31,Sarah Chen,2026-06-01,2026-05-15,New Business,SMB
+Pinnacle Healthcare - Patient Suite,Prospecting,118000,2026-09-15,Marcus Webb,2026-05-18,2026-05-05,New Business,Enterprise
+Foxwood Consulting - Team Bundle,Prospecting,22000,2026-09-15,Jordan Lee,2026-06-02,2026-05-20,New Business,SMB
+Silverline Logistics - Route Module,Prospecting,44000,2026-09-15,Sarah Chen,2026-05-25,2026-05-18,Expansion,Mid-Market
+Granite Partners - Analytics Suite,Prospecting,56000,2026-09-30,Marcus Webb,2026-06-01,2026-05-22,New Business,Mid-Market
+Wavecrest Media - Growth Package,Prospecting,31000,2026-09-30,Jordan Lee,2026-05-27,2026-05-25,New Business,SMB
+Bluehaven Insurance - Core Platform,Prospecting,89000,2026-09-30,Sarah Chen,2026-06-02,2026-05-28,New Business,Enterprise
