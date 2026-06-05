@@ -271,7 +271,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
                     st.caption(f"Related to: {r['deal_or_rep']}")
 
     # Revenue Opportunities
-    opps = [o for o in forecast.get("revenue_opportunities", []) if o.get("description") and o.get("upside_scenario")]
+    opps = [o for o in forecast.get("revenue_opportunities", []) if o.get("description")]
     if opps:
         st.markdown("### 🚀 Revenue Opportunities")
         for o in opps:
@@ -279,7 +279,8 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
             label_safe = label.replace("$", r"\$")
             with st.expander(f"✅ {label_safe}", expanded=False):
                 safe_text(o["description"])
-                st.caption(f"Upside: {o['upside_scenario']}")
+                if o.get("upside_scenario"):
+                    st.caption(f"Upside: {o['upside_scenario']}")
 
     st.divider()
 
