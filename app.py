@@ -271,7 +271,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
                     st.caption(f"Related to: {r['deal_or_rep']}")
 
     # Revenue Opportunities
-    opps = [o for o in forecast.get("revenue_opportunities", []) if o.get("description")]
+    opps = [o for o in forecast.get("revenue_opportunities", []) if o.get("description") and o.get("upside_scenario")]
     if opps:
         st.markdown("### 🚀 Revenue Opportunities")
         for o in opps:
@@ -301,7 +301,8 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
         for i, a in enumerate(actions, 1):
             urgency = a.get("urgency", "This week")
             icon = "🔴" if urgency == "This week" else "🟡" if urgency == "Before quarter end" else "🟢"
-            st.markdown(f"**{i}. {a['action']}**")
+            action_safe = a['action'].replace("$", r"\$")
+            st.markdown(f"**{i}. {action_safe}**")
             st.caption(f"{icon} {urgency} — {a['rationale']}")
 
     st.divider()
