@@ -338,6 +338,16 @@ def build_user_prompt(metrics: dict, quality: dict) -> str:
         "language leadership can use directly. "
         "Do not recalculate numbers already provided above — interpret them."
     )
+    lines.append("")
+    lines.append("## REQUIRED TOOL CALLS — work through these in order, do not skip any:")
+    lines.append("1. write_executive_summary — call this first, exactly once.")
+    lines.append("2. assess_forecast_confidence — call this second, exactly once.")
+    lines.append("3. identify_revenue_risks — call this 2-4 times, once per distinct risk.")
+    lines.append("4. identify_revenue_opportunities — call this 1-3 times, once per distinct opportunity.")
+    lines.append("5. generate_rep_insights — call this once per rep in the rep summary. Do not skip.")
+    lines.append("6. generate_leadership_actions — call this exactly 3 times, once per action. Last step. Do not finish without 3 actions.")
+    lines.append("")
+    lines.append("You are not done until all six tool types have been called. Check before finishing.")
 
     return "\n".join(lines)
 
