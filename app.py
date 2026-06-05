@@ -15,6 +15,11 @@ from preprocessing import (
 )
 from prompt import run_forecast_analysis
 
+def safe_text(text: str):
+    """Render narrative text safely — escapes dollar signs so Streamlit
+    doesn't interpret amounts like $438,600 as markdown math."""
+    st.markdown(text.replace("$", r"\$"))
+
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Pipeline & Forecast Synthesizer",
@@ -239,7 +244,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
     # Executive Summary
     if forecast.get("executive_summary"):
         st.markdown("### Executive Summary")
-        st.write(forecast["executive_summary"])
+        safe_text(forecast["executive_summary"])
 
     # Forecast Confidence
     fc = forecast.get("forecast_confidence", {})
@@ -247,7 +252,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
         level = fc.get("level", "Medium")
         badge = "🟢" if level == "High" else "🟡" if level == "Medium" else "🔴"
         st.markdown(f"### Forecast Confidence: {badge} {level}")
-        st.write(fc["narrative"])
+        safe_text(fc["narrative"])
 
     st.divider()
 
@@ -260,7 +265,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
             icon = "🔴" if sev == "High" else "🟡" if sev == "Medium" else "🟢"
             label = r["description"][:80] + "..." if len(r["description"]) > 80 else r["description"]
             with st.expander(f"{icon} **[{sev}]** {label}", expanded=True):
-                st.write(r["description"])
+                safe_text(r["description"])
                 if r.get("deal_or_rep"):
                     st.caption(f"Related to: {r['deal_or_rep']}")
 
@@ -271,7 +276,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
         for o in opps:
             label = o["description"][:80] + "..." if len(o["description"]) > 80 else o["description"]
             with st.expander(f"✅ {label}", expanded=False):
-                st.write(o["description"])
+                safe_text(o["description"])
                 st.caption(f"Upside: {o['upside_scenario']}")
 
     st.divider()
@@ -282,7 +287,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
         st.markdown("### 👤 Rep Insights")
         for r in rep_insights:
             st.markdown(f"**{r['rep_name']}**")
-            st.write(r["observation"])
+            safe_text(r["observation"])
             st.caption(f"→ {r['implication']}")
 
     st.divider()
