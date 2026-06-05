@@ -445,10 +445,10 @@ def run_forecast_analysis(
     try:
         response = client.messages.create(
             model="claude-sonnet-4-6",
-            max_tokens=4096,
+            max_tokens=8192,
             system=system_prompt,
             tools=TOOLS,
-            tool_choice={"type": "auto"},
+            tool_choice={"type": "any"},
             messages=[{"role": "user", "content": user_prompt}],
         )
     except anthropic.APIConnectionError as e:
