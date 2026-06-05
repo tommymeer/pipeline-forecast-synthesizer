@@ -243,7 +243,7 @@ Combined with the WBR Generator and Meeting Intelligence, it completes the Opera
 - **Meeting Intelligence** → execution
 - **Pipeline Synthesizer** → forecasting
 
-The HubSpot live integration demonstrates understanding of how AI agents connect to live organizational systems — not just processing uploaded files, but pulling data from where it actually lives.
+The HubSpot integration demonstrates a deliberate architectural choice: direct API integration for deterministic, scheduled data ingestion — the right pattern when the fetch is infrastructure, not an agent decision.
 
 ---
 
