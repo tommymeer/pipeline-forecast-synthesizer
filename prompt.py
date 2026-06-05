@@ -228,6 +228,16 @@ Call identify_revenue_risks 2-4 times for distinct risks. \
 Call identify_revenue_opportunities 1-3 times for distinct opportunities. \
 Call generate_rep_insights once per rep with a meaningful observation. \
 Call generate_leadership_actions exactly 3 times — one per action.\
+
+Extraction invariants — you must call all six tools before finishing:
+- write_executive_summary: required, exactly once.
+- assess_forecast_confidence: required, exactly once.
+- identify_revenue_risks: required, at least twice.
+- identify_revenue_opportunities: required, at least once.
+- generate_rep_insights: required for every rep with data. If only one owner \
+exists, call it once for that owner. If unowned deals exist, call it for "Unowned".
+- generate_leadership_actions: required, exactly 3 times. Non-negotiable. \
+Do not terminate without 3 leadership actions.\
 """
 
 
