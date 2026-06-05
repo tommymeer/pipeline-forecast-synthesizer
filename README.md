@@ -1,6 +1,6 @@
 # Pipeline & Forecast Synthesizer
 
-> *Third tool in the [Operational Coherence Stack](https://github.com/your-username) — turning organizational data into executive clarity.*
+> *Third tool in the [Operational Coherence Stack](https://github.com/tommymeer) — turning organizational data into executive clarity.*
 
 **WBR Generator** answers *what happened?*
 **Meeting Intelligence** answers *what was decided?*
