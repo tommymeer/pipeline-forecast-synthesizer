@@ -208,7 +208,7 @@ if run_button:
         st.error("No metrics could be calculated. Check your column mapping and try again.")
         st.stop()
 
-    with st.spinner("Generating forecast analysis with Claude..."):
+    with st.spinner("Generating forecast analysis — this takes about 60 seconds..."):
         forecast, api_error = run_forecast_analysis(metrics=metrics, quality=quality, api_key=api_key)
 
     if api_error:
@@ -264,25 +264,27 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
             sev = r.get("severity", "Medium")
             icon = "🔴" if sev == "High" else "🟡" if sev == "Medium" else "🟢"
             label = r["description"][:80] + "..." if len(r["description"]) > 80 else r["description"]
-            with st.expander(f"{icon} **[{sev}]** {label}", expanded=True):
+            label_safe = label.replace("$", r"\$")
+            with st.expander(f"{icon} **[{sev}]** {label_safe}", expanded=True):
                 safe_text(r["description"])
                 if r.get("deal_or_rep"):
                     st.caption(f"Related to: {r['deal_or_rep']}")
 
     # Revenue Opportunities
-    opps = forecast.get("revenue_opportunities", [])
+    opps = [o for o in forecast.get("revenue_opportunities", []) if o.get("description")]
     if opps:
         st.markdown("### 🚀 Revenue Opportunities")
         for o in opps:
             label = o["description"][:80] + "..." if len(o["description"]) > 80 else o["description"]
-            with st.expander(f"✅ {label}", expanded=False):
+            label_safe = label.replace("$", r"\$")
+            with st.expander(f"✅ {label_safe}", expanded=False):
                 safe_text(o["description"])
                 st.caption(f"Upside: {o['upside_scenario']}")
 
     st.divider()
 
     # Rep Insights
-    rep_insights = forecast.get("rep_insights", [])
+    rep_insights = [r for r in forecast.get("rep_insights", []) if r.get("observation")]
     if rep_insights:
         st.markdown("### 👤 Rep Insights")
         for r in rep_insights:
@@ -293,7 +295,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
     st.divider()
 
     # Leadership Actions
-    actions = forecast.get("leadership_actions", [])
+    actions = [a for a in forecast.get("leadership_actions", []) if a.get("action")]
     if actions:
         st.markdown("### ⚡ Leadership Actions This Week")
         for i, a in enumerate(actions, 1):
