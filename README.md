@@ -255,4 +255,4 @@ The HubSpot live integration demonstrates understanding of how AI agents connect
 
 ---
 
-*Part of the [Operational Coherence Stack](https://github.com/your-username) — WBR Generator · Meeting Intelligence · Pipeline Synthesizer · Prioritization Engine · Eval Harness*
+*Part of the [Operational Coherence Stack](https://github.com/tommymeer) — WBR Generator · Meeting Intelligence · Pipeline Synthesizer · Prioritization Engine · Eval Harness*
