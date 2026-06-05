@@ -244,9 +244,27 @@ Do not terminate without 3 leadership actions.\
 # ── User prompt ────────────────────────────────────────────────────────────────
 
 def build_user_prompt(metrics: dict, quality: dict) -> str:
-    lines = ["## PIPELINE METRICS"]
+    lines = []
+    # Checklist injected at the TOP — Claude reads this before the data,
+    # priming it to cover all six tool types before finishing.
+    lines.append("## EXTRACTION INSTRUCTIONS")
+    lines.append(
+        "Work through the pipeline metrics and call tools for every section. "
+        "Before you finish, confirm you have called each of these tools:\n"
+        "- write_executive_summary: call this first, exactly once.\n"
+        "- assess_forecast_confidence: call this second, exactly once.\n"
+        "- identify_revenue_risks: call this 2-4 times, once per distinct risk.\n"
+        "- identify_revenue_opportunities: call this 1-3 times, once per opportunity.\n"
+        "- generate_rep_insights: call this once per rep in the rep summary. Do not skip.\n"
+        "- generate_leadership_actions: call this exactly 3 times. This is the last step. "
+        "Do not finish without 3 leadership actions. An empty section is only correct if "
+        "you actively looked and found nothing — not if you stopped early."
+    )
+    lines.append("")
+    lines.append("## PIPELINE METRICS")
     lines.append("The following metrics have been pre-computed from the pipeline data.")
     lines.append("")
+
 
     summary = metrics.get("summary", {})
     lines.append("### Summary")
@@ -338,17 +356,6 @@ def build_user_prompt(metrics: dict, quality: dict) -> str:
         "language leadership can use directly. "
         "Do not recalculate numbers already provided above — interpret them."
     )
-    lines.append("")
-    lines.append("## REQUIRED TOOL CALLS — work through these in order, do not skip any:")
-    lines.append("1. write_executive_summary — call this first, exactly once.")
-    lines.append("2. assess_forecast_confidence — call this second, exactly once.")
-    lines.append("3. identify_revenue_risks — call this 2-4 times, once per distinct risk.")
-    lines.append("4. identify_revenue_opportunities — call this 1-3 times, once per distinct opportunity.")
-    lines.append("5. generate_rep_insights — call this once per rep in the rep summary. Do not skip.")
-    lines.append("6. generate_leadership_actions — call this exactly 3 times, once per action. Last step. Do not finish without 3 actions.")
-    lines.append("")
-    lines.append("You are not done until all six tool types have been called. Check before finishing.")
-
     return "\n".join(lines)
 
 
