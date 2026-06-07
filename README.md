@@ -1,7 +1,5 @@
 # Pipeline & Forecast Synthesizer
 
-> *Third tool in the [Operational Coherence Stack](https://github.com/tommymeer) — turning organizational data into executive clarity.*
-
 **WBR Generator** answers *what happened?*
 **Meeting Intelligence** answers *what was decided?*
 **Pipeline & Forecast Synthesizer** answers *what will happen?*
@@ -50,54 +48,35 @@ No export needed. The tool fetches your deals directly from HubSpot, maps them a
 
 ## Getting your HubSpot token
 
-HubSpot uses **Private App tokens** for API access (legacy API keys were deprecated in 2022). Creating one takes about 2 minutes.
+You need a HubSpot API token with CRM read access. HubSpot's token system evolves frequently — as of mid-2026, the recommended path for single-account API access is a **Service Key**, though you may see **Private Apps** or another option depending on your account type. Both produce a token that works with this tool.
 
-### Step-by-step
+### Fastest path — ask an AI assistant
 
-**1. Go to Private Apps**
-In your HubSpot account:
-→ Click the **Settings** gear (top-right corner)
-→ **Integrations** → **Private Apps**
-→ Click **Create a private app**
-
-**2. Name the app**
-Give it any name — e.g., *"Pipeline Synthesizer"*. Description is optional.
-
-**3. Set scopes**
-Click the **Scopes** tab. Under **CRM**, enable:
-- ✅ `crm.objects.deals.read`
-- ✅ `crm.objects.owners.read` *(required for rep name resolution — without this, owner IDs appear instead of names)*
-
-You don't need write access.
-
-**4. Create and copy the token**
-Click **Create app** → confirm → copy the token that appears.
-It looks like: `pat-na1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
-
-> ⚠️ **HubSpot only shows the full token once.** Copy it before closing the dialog. If you lose it, you can generate a new one from the same Private App settings page.
-
-**5. Paste it into the app**
-The token is never stored — it lives only in your browser session and is used only for the current analysis run.
-
-### Using an AI assistant to navigate HubSpot's UI
-
-If HubSpot's settings UI has changed since this guide was written, or if you want guided help navigating it, copy this prompt into ChatGPT, Claude, or any AI tool:
+Because HubSpot's UI updates often, the most reliable approach is to ask an AI tool to walk you through your specific account. Copy and paste this prompt into ChatGPT, Claude, or any AI assistant:
 
 ```
-I use HubSpot CRM. Walk me through creating a Private App token with
-crm.objects.deals.read and crm.objects.owners.read scopes so I can
-connect my pipeline data to an external tool. My HubSpot account is
-[your account name or URL if relevant]. Give me step-by-step instructions
-for the current HubSpot UI.
+I use HubSpot CRM and I want to generate an API token so I can connect my
+pipeline data to an external tool. The token needs read access to deals and
+owners: crm.objects.deals.read and crm.objects.owners.read. Walk me through
+the current HubSpot UI step by step — I may see Private Apps, Service Keys,
+or another option depending on my account. My HubSpot account URL is
+[paste your HubSpot URL].
 ```
 
-This is especially useful if you're not familiar with HubSpot's developer settings or if the UI layout has been updated.
+### What to look for regardless of path
+
+- ✅ `crm.objects.deals.read` scope enabled
+- ✅ `crm.objects.owners.read` scope enabled (required for rep name resolution)
+- ✅ Read-only access — no write permissions needed
+- The token starts with `pat-` followed by your region and a unique string
+
+**Copy the token as soon as it's shown** — HubSpot typically only displays it once.
 
 ### Token security
 
 - The token is not saved to any database or file — it exists only in your active browser session
 - Treat it like a password: don't paste it into a shared screen or commit it to any file in your repo
-- You can revoke access at any time by deleting the Private App in HubSpot Settings → Integrations → Private Apps
+- You can revoke access at any time by deleting the key in HubSpot
 - For shared or team deployments, consider storing the token as a Streamlit secret rather than having each user paste it manually
 
 ---
@@ -243,7 +222,7 @@ Combined with the WBR Generator and Meeting Intelligence, it completes the Opera
 - **Meeting Intelligence** → execution
 - **Pipeline Synthesizer** → forecasting
 
-The HubSpot integration demonstrates a deliberate architectural choice: direct API integration for deterministic, scheduled data ingestion — the right pattern when the fetch is infrastructure, not an agent decision.
+The HubSpot live integration demonstrates understanding of how AI agents connect to live organizational systems — not just processing uploaded files, but pulling data from where it actually lives.
 
 ---
 
@@ -254,5 +233,3 @@ The HubSpot integration demonstrates a deliberate architectural choice: direct A
 - **HubSpot API** — free for Private App access within standard rate limits
 
 ---
-
-*Part of the [Operational Coherence Stack](https://github.com/tommymeer) — WBR Generator · Meeting Intelligence · Pipeline Synthesizer · Prioritization Engine · Eval Harness*
