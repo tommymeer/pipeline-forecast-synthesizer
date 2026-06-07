@@ -135,7 +135,7 @@ Copy and paste this prompt into ChatGPT, Claude, or any AI tool:
 
     if fetch_button:
         if not hs_token or not hs_token.strip():
-            st.error("Paste your HubSpot Private App token above.")
+            st.error("Paste your HubSpot API token above.")
         else:
             with st.spinner("Connecting to HubSpot and fetching deals..."):
                 hs_df, schema_report, hs_error = fetch_hubspot_pipeline(hs_token)
@@ -499,10 +499,10 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
                 if r.get("deal_or_rep"):
                     safe_caption(f"Related to: {r['deal_or_rep']}")
 
-    # Revenue Opportunities
-    opps = [o for o in forecast.get("revenue_opportunities", []) if o.get("description")]
+    # Paths to Outperformance (formerly Revenue Opportunities)
+    opps = [o for o in forecast.get("revenue_opportunities", []) if o.get("description") and o.get("upside_scenario")]
     if opps:
-        st.markdown("### 🚀 Revenue Opportunities")
+        st.markdown("### 🚀 Paths to Outperformance")
         for o in opps:
             label = o["description"][:80] + "..." if len(o["description"]) > 80 else o["description"]
             label_safe = label.replace("$", r"\$")
@@ -597,7 +597,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
                 lines.append(f"[{r['severity']}] {r['description']}")
             lines.append("")
         if forecast.get("revenue_opportunities"):
-            lines.append("## REVENUE OPPORTUNITIES")
+            lines.append("## PATHS TO OUTPERFORMANCE")
             for o in forecast["revenue_opportunities"]:
                 lines += [f"• {o['description']}", f"  Upside: {o['upside_scenario']}"]
             lines.append("")
