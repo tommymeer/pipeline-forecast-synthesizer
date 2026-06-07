@@ -373,15 +373,23 @@ def run_forecast_analysis(
         ]
 
         # ── 6. Leadership Actions ─────────────────────────────────────────────
-        # Force exactly 3 by making 3 sequential calls with context
+        # Force exactly 3 by making 3 sequential calls with context.
+        # Each call receives a summary of prior actions so Claude is steered
+        # toward distinct risks, stakeholders, and time horizons.
         action_context = (
             "Based on the pipeline risks and opportunities identified, "
             "generate one concrete leadership action for this week. "
             "Be specific — name deals, reps, or amounts."
         )
         for i in range(3):
+            prior_actions = [a["action"][:80] for a in result["leadership_actions"]]
+            prior_note = (
+                f" Actions already identified: {prior_actions}. "
+                "This action must address a distinctly different risk, stakeholder, "
+                "or time horizon — do not repeat or restate a prior action."
+            ) if prior_actions else ""
             r = _forced_call(client, system, mp, TOOL_LEADERSHIP_ACTIONS,
-                f"{action_context} This is action {i+1} of 3.",
+                f"{action_context} This is action {i+1} of 3.{prior_note}",
                 max_tokens=512)
             if r.get("action"):
                 result["leadership_actions"].append({
