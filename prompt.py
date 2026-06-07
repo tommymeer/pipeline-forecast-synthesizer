@@ -9,9 +9,9 @@ Six forced calls:
   1. write_executive_summary
   2. assess_forecast_confidence
   3. identify_revenue_risks (any — multiple calls allowed)
-  4. identify_revenue_opportunities (any — multiple calls allowed)
+  4. identify_leverage_points (any — multiple calls allowed)
   5. generate_rep_insights (any — one per rep)
-  6. generate_leadership_actions (any — exactly 3)
+  6. generate_leadership_actions (any — exactly 3, one per intervention layer)
 """
 
 import anthropic
@@ -86,23 +86,32 @@ TOOL_REVENUE_RISKS = {
     },
 }
 
-TOOL_REVENUE_OPPORTUNITIES = {
-    "name": "identify_revenue_opportunities",
+TOOL_LEVERAGE_POINTS = {
+    "name": "identify_leverage_points",
     "description": (
-        "Identify one specific upside opportunity in the current pipeline. "
-        "What suggests the quarter could close above the weighted forecast? "
-        "Call this once per distinct opportunity."
+        "Identify one specific leverage point or path to outperformance in the current pipeline. "
+        "Do not simply restate that a deal could close — identify what makes this deal, rep, or "
+        "cohort a genuine upside lever: recent engagement signals, favorable stage velocity, "
+        "deal clustering that could be accelerated together, or a rep whose pipeline health "
+        "is stronger than the aggregate suggests. "
+        "A leverage point answers 'where should leadership focus attention to beat the forecast?' "
+        "not just 'what deals exist?'. "
+        "Call this once per distinct leverage point."
     ),
     "input_schema": {
         "type": "object",
         "properties": {
             "description": {
                 "type": "string",
-                "description": "Specific opportunity. Name deals or amounts. State what would need to happen.",
+                "description": (
+                    "Specific leverage point. Name the deal, rep, or cohort. "
+                    "Explain what makes this an outperformance lever — not just a deal summary. "
+                    "State what action or condition would convert this into realized upside."
+                ),
             },
             "upside_scenario": {
                 "type": "string",
-                "description": "One sentence on what closing this means for the quarter.",
+                "description": "One sentence on what this means for the quarter if the lever is pulled.",
             },
         },
         "required": ["description", "upside_scenario"],
@@ -114,6 +123,8 @@ TOOL_REP_INSIGHTS = {
     "description": (
         "Generate an insight about one rep's pipeline health. "
         "Look for concentration within their book, stale activity, single-deal dependency. "
+        "If a rep has limited data, still produce a brief observation about their pipeline "
+        "contribution and what it means for Q3 coverage — do not leave the analysis blank. "
         "Call once per rep. If only one owner exists, call once for that owner. "
         "If unowned deals exist, call once for 'Unowned'."
     ),
@@ -123,7 +134,11 @@ TOOL_REP_INSIGHTS = {
             "rep_name": {"type": "string"},
             "observation": {
                 "type": "string",
-                "description": "What the data shows about this rep. Reference amounts and deal counts.",
+                "description": (
+                    "What the data shows about this rep. Reference amounts and deal counts. "
+                    "If data is sparse, note the pipeline contribution and coverage implications — "
+                    "never return a blank or placeholder observation."
+                ),
             },
             "implication": {
                 "type": "string",
@@ -139,8 +154,7 @@ TOOL_LEADERSHIP_ACTIONS = {
     "description": (
         "Generate one concrete action leadership should take this week. "
         "Specific and immediately actionable — not generic sales advice. "
-        "Address a specific risk or opportunity from the analysis. "
-        "Call this exactly 3 times total."
+        "Call this exactly 3 times total, once per intervention layer."
     ),
     "input_schema": {
         "type": "object",
@@ -338,20 +352,29 @@ def run_forecast_analysis(
             for r in risks_raw
         ]
 
-        # ── 4. Revenue Opportunities ──────────────────────────────────────────
-        opps_raw = _any_call(client, system, mp, TOOL_REVENUE_OPPORTUNITIES,
-            "Identify all distinct revenue opportunities in this pipeline. "
-            "Call identify_revenue_opportunities once per opportunity.",
-            max_tokens=1024)
+        # ── 4. Leverage Points (Paths to Outperformance) ──────────────────────
+        # Reframed from "Revenue Opportunities" to focus on genuine leverage:
+        # where should leadership direct attention to beat the forecast?
+        # Not just a list of deals that could close.
+        opps_raw = _any_call(client, system, mp, TOOL_LEVERAGE_POINTS,
+            "Identify the specific leverage points in this pipeline — where could "
+            "leadership focus attention to outperform the weighted forecast? "
+            "Look for: deals with recent positive engagement, rep books that are "
+            "healthier than the aggregate suggests, deal cohorts that could be "
+            "accelerated together, or early-close signals. "
+            "Do not simply list deals as opportunities — identify what makes each "
+            "a genuine lever and what action converts it to upside. "
+            "Call identify_leverage_points once per distinct leverage point. Aim for 3-5.",
+            max_tokens=2048)
         result["revenue_opportunities"] = [
             {"description": r.get("description", ""), "upside_scenario": r.get("upside_scenario", "")}
             for r in opps_raw
+            if r.get("description", "").strip() and r.get("upside_scenario", "").strip()
         ]
 
         # ── 5. Rep Insights ───────────────────────────────────────────────────
         rep_summary = metrics.get("rep_summary", [])
         rep_names = [r["rep"] for r in rep_summary] if rep_summary else []
-        # Check for unowned deals
         has_unowned = any(
             not r.get("owner") or str(r.get("owner", "")).strip().lower() in
             {"", "null", "none", "unassigned", "tbd"}
@@ -364,32 +387,55 @@ def run_forecast_analysis(
 
         rep_raw = _any_call(client, system, mp, TOOL_REP_INSIGHTS,
             f"Generate rep insights. {rep_context} "
-            "Call generate_rep_insights once per rep. Include an insight for 'Unowned' if unowned deals exist.",
+            "Call generate_rep_insights once per rep. "
+            "For reps with limited data, still produce a brief observation about "
+            "pipeline contribution and Q3 coverage implications — never return blank. "
+            "Include an insight for 'Unowned' if unowned deals exist.",
             max_tokens=1024)
         result["rep_insights"] = [
             {"rep_name": r.get("rep_name", ""), "observation": r.get("observation", ""),
              "implication": r.get("implication", "")}
             for r in rep_raw
+            if r.get("observation", "").strip()
         ]
 
         # ── 6. Leadership Actions ─────────────────────────────────────────────
-        # Force exactly 3 by making 3 sequential calls with context.
-        # Each call receives a summary of prior actions so Claude is steered
-        # toward distinct risks, stakeholders, and time horizons.
-        action_context = (
-            "Based on the pipeline risks and opportunities identified, "
-            "generate one concrete leadership action for this week. "
-            "Be specific — name deals, reps, or amounts."
-        )
-        for i in range(3):
+        # Force exactly 3 by making 3 sequential calls, one per intervention layer.
+        # Layer 1: Deal intervention — specific deal-level action
+        # Layer 2: Rep intervention — rep capacity, coverage, or accountability action
+        # Layer 3: Process intervention — structural or organizational action
+        # Each call receives prior actions to prevent repetition.
+        action_layers = [
+            (
+                "DEAL INTERVENTION: Generate one action focused on a specific deal or set of deals. "
+                "Name the deal(s), the dollar amount at stake, and the exact step needed this week "
+                "(e.g. executive call, contract review, buyer outreach). "
+                "This is action 1 of 3."
+            ),
+            (
+                "REP INTERVENTION: Generate one action focused on rep capacity, accountability, "
+                "or pipeline ownership. This should address something about how the rep is managing "
+                "their book — coverage gaps, bandwidth, forecast hygiene, or coaching needs. "
+                "Do not repeat the deal-level action already identified. "
+                "This is action 2 of 3."
+            ),
+            (
+                "PROCESS INTERVENTION: Generate one action focused on an organizational or structural "
+                "improvement — pipeline hygiene, ownership assignment, stage criteria, Q3 coverage "
+                "planning, or deal desk readiness. This should address a systemic issue, not a "
+                "specific deal or rep already covered. "
+                "This is action 3 of 3."
+            ),
+        ]
+
+        for i, layer_instruction in enumerate(action_layers):
             prior_actions = [a["action"][:80] for a in result["leadership_actions"]]
             prior_note = (
                 f" Actions already identified: {prior_actions}. "
-                "This action must address a distinctly different risk, stakeholder, "
-                "or time horizon — do not repeat or restate a prior action."
+                "Do not repeat or restate these."
             ) if prior_actions else ""
             r = _forced_call(client, system, mp, TOOL_LEADERSHIP_ACTIONS,
-                f"{action_context} This is action {i+1} of 3.{prior_note}",
+                f"{layer_instruction}{prior_note}",
                 max_tokens=512)
             if r.get("action"):
                 result["leadership_actions"].append({
