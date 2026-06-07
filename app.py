@@ -32,6 +32,11 @@ def safe_text(text: str):
     st.markdown(text.replace("$", r"\$"))
 
 
+def safe_caption(text: str):
+    """Render caption text safely — same dollar sign escaping as safe_text."""
+    st.caption(text.replace("$", r"\$"))
+
+
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Pipeline & Forecast Synthesizer",
@@ -492,7 +497,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
             with st.expander(f"{icon} **[{sev}]** {label_safe}", expanded=True):
                 safe_text(r["description"])
                 if r.get("deal_or_rep"):
-                    st.caption(f"Related to: {r['deal_or_rep']}")
+                    safe_caption(f"Related to: {r['deal_or_rep']}")
 
     # Revenue Opportunities
     opps = [o for o in forecast.get("revenue_opportunities", []) if o.get("description")]
@@ -504,7 +509,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
             with st.expander(f"✅ {label_safe}", expanded=False):
                 safe_text(o["description"])
                 if o.get("upside_scenario"):
-                    st.caption(f"Upside: {o['upside_scenario']}")
+                    safe_caption(f"Upside: {o['upside_scenario']}")
 
     st.divider()
 
@@ -515,7 +520,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
         for r in rep_insights:
             st.markdown(f"**{r['rep_name']}**")
             safe_text(r["observation"])
-            st.caption(f"→ {r['implication']}")
+            safe_caption(f"→ {r['implication']}")
 
     st.divider()
 
@@ -528,7 +533,7 @@ if st.session_state.get("forecast") and st.session_state.get("metrics"):
             icon        = "🔴" if urgency == "This week" else "🟡" if urgency == "Before quarter end" else "🟢"
             action_safe = a["action"].replace("$", r"\$")
             st.markdown(f"**{i}. {action_safe}**")
-            st.caption(f"{icon} {urgency} — {a['rationale']}")
+            safe_caption(f"{icon} {urgency} — {a['rationale']}")
 
     st.divider()
 
