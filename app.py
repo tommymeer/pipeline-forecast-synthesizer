@@ -75,66 +75,54 @@ input_source  = None
 with tab_hs:
     st.markdown("#### Connect HubSpot directly — no export needed.")
     st.markdown(
-        "Paste your HubSpot Private App token below. Your deals are fetched live, "
+        "Paste your HubSpot API token below. Your deals are fetched live, "
         "mapped automatically to the standard schema, and the column mapping step is skipped."
     )
 
     # ── Token instructions (collapsed by default) ─────────────────────────────
     with st.expander("📋 How to get your HubSpot token — step by step", expanded=False):
         st.markdown("""
-**What you need:** A HubSpot Private App token. This is different from your API key
-(HubSpot deprecated legacy API keys in 2022). Creating one takes about 2 minutes.
+**What you need:** A HubSpot API token with CRM read access.
+
+HubSpot's token system has evolved — as of mid-2026, the recommended path for
+single-account API access is a **Service Key** (found under Settings → Integrations
+or the Developer section). You may also see **Private Apps** depending on your
+account type. Both produce a token that works with this tool.
+
+**Because HubSpot's UI updates frequently, the fastest approach is to ask an AI
+assistant to walk you through it for your specific account.**
+
+Copy and paste this prompt into ChatGPT, Claude, or any AI tool:
+
+> *"I use HubSpot CRM and I want to generate an API token so I can connect my
+> pipeline data to an external tool. The token needs read access to deals and owners:
+> `crm.objects.deals.read` and `crm.objects.owners.read`. Walk me through the current
+> HubSpot UI step by step — I may see Private Apps, Service Keys, or another option
+> depending on my account. My HubSpot account URL is [paste your HubSpot URL]."*
 
 ---
 
-**Step 1 — Go to Private Apps**
-In your HubSpot account, click the **Settings** gear (top right) →
-**Integrations** → **Private Apps** → **Create a private app**.
+**What to look for regardless of path:**
+- ✅ `crm.objects.deals.read` scope enabled
+- ✅ `crm.objects.owners.read` scope enabled
+- ✅ Read-only access — no write permissions needed
+- The token will start with `pat-` followed by your region and a unique string
 
-**Step 2 — Name it**
-Give it any name, e.g. *"Pipeline Synthesizer"*. The description is optional.
-
-**Step 3 — Set scopes**
-Click the **Scopes** tab. Under **CRM**, enable:
-- ✅ `crm.objects.deals.read`
-- ✅ `crm.objects.owners.read` *(needed to show rep names instead of IDs)*
-
-You don't need write access — this tool only reads.
-
-**Step 4 — Create and copy the token**
-Click **Create app** → confirm → copy the token that appears.
-It starts with `pat-na1-` (or a similar region prefix).
-**Important:** HubSpot only shows the full token once. Copy it now.
-
-**Step 5 — Paste it below**
-The token is never stored — it's used only for this session.
-
----
-
-**Using an AI assistant to navigate HubSpot's settings?**
-You can copy and paste this prompt into ChatGPT, Claude, or any AI tool:
-
-> *"I use HubSpot CRM. Walk me through creating a Private App token with
-> `crm.objects.deals.read` and `crm.objects.owners.read` scopes so I can
-> connect my pipeline data to an external tool. My HubSpot account is
-> [your account name/URL if relevant]. Give me step-by-step instructions
-> for the current HubSpot UI."*
-
-This is especially useful if HubSpot has updated their UI since this guide was written.
+**Copy the token as soon as it's shown** — HubSpot typically only displays it once.
 
 ---
 
 **Token security**
 - The token is not saved anywhere — it lives only in your browser session.
 - Treat it like a password. Don't paste it into a shared screen or commit it to GitHub.
-- You can delete the Private App in HubSpot at any time to revoke access.
+- You can revoke access at any time by deleting the key in HubSpot.
         """)
 
     hs_token = st.text_input(
-        "HubSpot Private App token",
+        "HubSpot API token",
         type="password",
         placeholder="pat-na1-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-        help="Starts with pat-na1- or similar. Found in HubSpot Settings → Integrations → Private Apps.",
+        help="Service Key or Private App token. Starts with pat-. See instructions above.",
         key="hs_token_input",
     )
 
